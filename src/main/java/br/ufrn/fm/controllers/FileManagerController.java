@@ -1,5 +1,6 @@
 package br.ufrn.fm.controllers;
 
+import br.ufrn.fm.models.MakeDirDetails;
 import org.springframework.http.MediaType;
 
 import org.springframework.http.HttpStatus;
@@ -34,9 +35,11 @@ public class FileManagerController {
     public static final String root = "storage/";
 
     private Command command;
+    private CommandsService commandsService;
 
     public FileManagerController(){
         this.command = new Command(root);
+        commandsService = new CommandsService(command);
     }
 
     @ApiOperation(value = "Request para mover um arquivo ou diretório",
@@ -88,8 +91,42 @@ public class FileManagerController {
         if (deleteDetails.isRecursive())
             responseTxt += " recursively";
         // @TODO verificar se os caminhos são válidos
-        boolean validPaths = true;
-        if (validPaths)
+        boolean result = command.removeDirectoryOrFile(root + deleteDetails.getPath());
+        if (result)
+            return ResponseEntity.ok().body(responseTxt);
+        else
+            // @TODO Colocar uma mensagem mais significativa dizendo se caminho é inválido ou o diretório está vazio
+            return ResponseEntity.badRequest().body("Operação inválida");
+    }
+
+    @PostMapping(value = "/make_dir",
+            consumes={MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE} )
+    public ResponseEntity<String> make_dir(HttpServletRequest request,
+                                         @RequestBody MakeDirDetails makeDirDetails) {
+        String responseTxt = "Creating " + makeDirDetails.getPath();
+        if (makeDirDetails.isRecursive())
+            responseTxt += " recursively";
+        // @TODO verificar se os caminhos são válidos
+        boolean result = command.createDirectory(root + makeDirDetails.getPath());
+        if (result)
+            return ResponseEntity.ok().body(responseTxt);
+        else
+            // @TODO Colocar uma mensagem mais significativa dizendo qual dos caminhos é inválido
+            return ResponseEntity.badRequest().body("Caminho inválido");
+    }
+
+    @PostMapping(value = "/create_file",
+            consumes={MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE} )
+    public ResponseEntity<String> create_file(HttpServletRequest request,
+                                           @RequestBody MakeDirDetails makeDirDetails) {
+        String responseTxt = "Creating " + makeDirDetails.getPath();
+        if (makeDirDetails.isRecursive())
+            responseTxt += " recursively";
+        // @TODO verificar se os caminhos são válidos
+        boolean result = commandsService.createFile(root + makeDirDetails.getPath());
+        if (result)
             return ResponseEntity.ok().body(responseTxt);
         else
             // @TODO Colocar uma mensagem mais significativa dizendo qual dos caminhos é inválido

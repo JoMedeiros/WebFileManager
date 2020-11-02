@@ -23,5 +23,17 @@ public class CommandsService {
             return null;
         }
     }
+
+    public boolean createFile(String path)
+    {
+        try {
+            command.createFile(path);
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }
 
