@@ -48,9 +48,9 @@ public class FileManagerController {
             produces = {MediaType.APPLICATION_JSON_VALUE} )
     public ResponseEntity<String> move(HttpServletRequest request,
                                        @RequestBody MoveDetails moveDetails) {
-        String responseTxt = "Moving " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
-        // @TODO verificar se os caminhos são válidos
-        boolean validPaths = true;
+        String responseTxt = "Moved " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
+        boolean validPaths = command.moveFile(root + moveDetails.getSourcePath(),
+                                                root + moveDetails.getDestinationPath());
         if (validPaths)
             return ResponseEntity.ok().body(responseTxt);
         else

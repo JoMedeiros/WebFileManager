@@ -23,5 +23,10 @@ public class CommandsService {
             return null;
         }
     }
+
+    public boolean moveFile(String filePath, String fileDestiny)
+    {
+        return command.moveFile(filePath, fileDestiny);
+    }
 }
 
