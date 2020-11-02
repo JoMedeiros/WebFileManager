@@ -1,6 +1,5 @@
 package br.ufrn.fm.controllers;
 
-import br.ufrn.fm.models.MakeDirDetails;
 import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 
@@ -20,8 +19,11 @@ import br.ufrn.fm.filesAccess.Command;
 import br.ufrn.fm.models.DeleteDetails;
 import br.ufrn.fm.models.MoveDetails;
 import br.ufrn.fm.models.ListDirDetails;
+import br.ufrn.fm.models.MakeDirDetails;
+import br.ufrn.fm.models.ShowContentDetails;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * Esse link pode ajudar com URI patterns:
@@ -49,7 +51,7 @@ public class FileManagerController {
     @PutMapping(
             value = "/move",
             consumes={MediaType.APPLICATION_JSON_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE} )
+            produces = {MediaType.TEXT_PLAIN_VALUE} )
     public ResponseEntity<String> move(HttpServletRequest request,
                                        @RequestBody MoveDetails moveDetails) {
         String responseTxt = "Moved " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
@@ -71,8 +73,7 @@ public class FileManagerController {
         HttpServletRequest request,
         @RequestBody ListDirDetails listDirDetails
     ) {
-        String dirPath = root + listDirDetails.getDirPath();
-        String[] response = command.listFiles(dirPath);
+        String[] response = command.listFiles(root + listDirDetails.getPath());
         if (response != null)
             return ResponseEntity.status(HttpStatus.OK).body(response);
         else
@@ -83,10 +84,10 @@ public class FileManagerController {
     @ApiParam(value = "Um objeto contendo o camingo do arquivo a ser deletado.")
     @DeleteMapping(value = "/delete",
             consumes={MediaType.APPLICATION_JSON_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE} )
+            produces = {MediaType.TEXT_PLAIN_VALUE} )
     public ResponseEntity<String> delete(HttpServletRequest request,
                                          @RequestBody DeleteDetails deleteDetails) {
-        String responseTxt = "Deleting " + deleteDetails.getPath();
+        String responseTxt = "Deleting: " + deleteDetails.getPath();
         if (deleteDetails.isRecursive())
             responseTxt += " recursively";
         // @TODO verificar se os caminhos são válidos
@@ -100,10 +101,10 @@ public class FileManagerController {
 
     @PostMapping(value = "/make_dir",
             consumes={MediaType.APPLICATION_JSON_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE} )
+            produces = {MediaType.TEXT_PLAIN_VALUE} )
     public ResponseEntity<String> make_dir(HttpServletRequest request,
                                          @RequestBody MakeDirDetails makeDirDetails) {
-        String responseTxt = "Creating " + makeDirDetails.getPath();
+        String responseTxt = "Creating:  " + makeDirDetails.getPath();
         if (makeDirDetails.isRecursive())
             responseTxt += " recursively";
         // @TODO verificar se os caminhos são válidos
@@ -117,10 +118,10 @@ public class FileManagerController {
 
     @PostMapping(value = "/create_file",
             consumes={MediaType.APPLICATION_JSON_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE} )
+            produces = {MediaType.TEXT_PLAIN_VALUE} )
     public ResponseEntity<String> create_file(HttpServletRequest request,
                                            @RequestBody MakeDirDetails makeDirDetails) {
-        String responseTxt = "Creating " + makeDirDetails.getPath();
+        String responseTxt = "Creating:  " + makeDirDetails.getPath();
         if (makeDirDetails.isRecursive())
             responseTxt += " recursively";
         // @TODO verificar se os caminhos são válidos
@@ -130,5 +131,23 @@ public class FileManagerController {
         else
             // @TODO Colocar uma mensagem mais significativa dizendo qual dos caminhos é inválido
             return ResponseEntity.badRequest().body("Caminho inválido");
+    }
+
+    @ApiOperation(value = "Request para mostrar o conteúdo de um arquivo")
+    @ApiParam(value = "Caminho do arquivo")
+    @GetMapping(value = "/showFileContent",
+            consumes={MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.TEXT_PLAIN_VALUE} )
+    public ResponseEntity<String> show_file_content(HttpServletRequest request,
+                                              @RequestBody ShowContentDetails showContentDetails) {
+        try {
+            // @TODO verificar se os caminhos são válidos
+            String response = command.showFileContent(root + showContentDetails.getPath());
+
+            return ResponseEntity.ok().body(response);
+        }catch(IOException e){
+            // @TODO Colocar uma mensagem mais significativa dizendo qual dos caminhos é inválido
+            return ResponseEntity.badRequest().body("Caminho inválido");
+        }
     }
 }

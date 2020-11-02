@@ -1,6 +1,6 @@
 package br.ufrn.fm.models;
 
-public class ListDirDetails {
+public class ShowContentDetails {
     private String path;
 
     public String getPath() {
@@ -10,5 +10,4 @@ public class ListDirDetails {
     public void setPath(String path) {
         this.path = path;
     }
-
 }
