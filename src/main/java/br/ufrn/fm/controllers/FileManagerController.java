@@ -1,9 +1,9 @@
 package br.ufrn.fm.controllers;
 
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import br.ufrn.fm.services.ListFilesInDirService;
+import br.ufrn.fm.services.CommandsService;
 
 import br.ufrn.fm.filesAccess.Command;
 
@@ -38,26 +38,6 @@ public class FileManagerController {
     public FileManagerController(){
         this.command = new Command(root);
     }
-  
-    /**
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/home/**/files")
-    public String list_from_home(HttpServletRequest request) {
-        return "from test2(), request uri: " + request.getRequestURI();
-    }
-
-    /**
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/root/**/files")
-    public String list_from_root(HttpServletRequest request) {
-        return "from list_files(), request uri: " + request.getRequestURI();
-    }
 
     @ApiOperation(value = "Request para mover um arquivo ou diretório",
             consumes = "Consome um JSON com dois campos: sourcePath e destinationPath. " +
@@ -79,21 +59,20 @@ public class FileManagerController {
     }
 
     @GetMapping(
-        value = "list/",
+        value = "/list",
         consumes={MediaType.APPLICATION_JSON_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE}
     )
-    public ResponseEntity<String> list_files_dir(
+    public ResponseEntity<String[]> list_files_dir(
         HttpServletRequest request,
         @RequestBody ListDirDetails listDirDetails
     ) {
         String dirPath = root + listDirDetails.getDirPath();
-
-        ListFilesInDirService listFilesInDirService = new ListFilesInDirService(this.command);
-
-        String response = listFilesInDirService.execute(dirPath);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        String[] response = command.listFiles(dirPath);
+        if (response != null)
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new String[]{"Caminho inválido"});
     }
 
     @ApiOperation(value = "Request para deletar um arquivo ou diretório",

@@ -3,7 +3,7 @@ package br.ufrn.fm.filesAccess;
 import java.io.*;
 import java.nio.file.Paths;
 
-public class Command implements ICommand {
+public class Command {
 
     public static final String EOL = System.getProperty("line.separator");
 
@@ -63,7 +63,6 @@ public class Command implements ICommand {
         return f.delete();
     }
 
-    @Override
     public String printWorkingDirectory() {
         Paths.get(".").toAbsolutePath().normalize().toString();
         return System.getProperty("user.dir");
