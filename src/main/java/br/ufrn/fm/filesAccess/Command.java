@@ -1,6 +1,7 @@
 package br.ufrn.fm.filesAccess;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Command {
@@ -56,6 +57,14 @@ public class Command {
         File d = new File(fileDestiny);
 
         return f.renameTo(d);
+    }
+
+    public void copyFile(String filePath, String fileDestiny) throws IOException {
+        File f = new File(filePath);
+
+        File d = new File(fileDestiny);
+
+        Files.copy(f.toPath(), d.toPath());
     }
 
     public boolean removeDirectoryOrFile(String fileOrDirName) {

@@ -1,6 +1,6 @@
 package br.ufrn.fm.controllers;
 
-import br.ufrn.fm.models.MakeDirDetails;
+import br.ufrn.fm.models.*;
 import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 
@@ -17,11 +17,8 @@ import br.ufrn.fm.services.CommandsService;
 
 import br.ufrn.fm.filesAccess.Command;
 
-import br.ufrn.fm.models.DeleteDetails;
-import br.ufrn.fm.models.MoveDetails;
-import br.ufrn.fm.models.ListDirDetails;
-
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * Esse link pode ajudar com URI patterns:
@@ -62,6 +59,27 @@ public class FileManagerController {
             return ResponseEntity.badRequest().body("Caminho inválido");
     }
 
+    @ApiOperation(value = "Copia um arquivo ou diretório")
+    @ApiParam(name = "moveDetails", value = "Um objeto com os campos de origem do arquivo e destino.")
+    @PutMapping(
+            value = "/copy",
+            consumes={MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE} )
+    public ResponseEntity<String> copy(HttpServletRequest request,
+                                       @RequestBody MoveDetails moveDetails) {
+        String responseTxt = "Copied " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
+        try {
+            command.copyFile(root + moveDetails.getSourcePath(),
+                    root + moveDetails.getDestinationPath());
+            return ResponseEntity.ok().body(responseTxt);
+        } catch (IOException e) {
+            // @TODO Colocar uma mensagem mais significativa dizendo qual dos caminhos é inválido
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Caminho inválido");
+        }
+    }
+
+    @ApiOperation(value = "Retorna uma lista de arquivos e diretórios")
     @GetMapping(
         value = "/list",
         consumes={MediaType.APPLICATION_JSON_VALUE},
@@ -79,7 +97,26 @@ public class FileManagerController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new String[]{"Caminho inválido"});
     }
 
-    @ApiOperation(value = "Request para deletar um arquivo ou diretório")
+    @ApiOperation(value = "Retorna o conteúdo de um arquivo")
+    @GetMapping(
+            value = "/get_content",
+            consumes={MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<String> get_content(
+            HttpServletRequest request,
+            @RequestBody GetContentDetails getContentDetails
+    ) {
+        String path = root + getContentDetails.getPath();
+        try {
+            String response = command.showFileContent(path);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Caminho inválido");
+        }
+    }
+
+    @ApiOperation(value = "Deleta um arquivo ou diretório")
     @ApiParam(value = "Um objeto contendo o camingo do arquivo a ser deletado.")
     @DeleteMapping(value = "/delete",
             consumes={MediaType.APPLICATION_JSON_VALUE},
@@ -98,6 +135,7 @@ public class FileManagerController {
             return ResponseEntity.badRequest().body("Operação inválida");
     }
 
+    @ApiOperation(value = "Cria um diretório")
     @PostMapping(value = "/make_dir",
             consumes={MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE} )
@@ -115,6 +153,7 @@ public class FileManagerController {
             return ResponseEntity.badRequest().body("Caminho inválido");
     }
 
+    @ApiOperation(value = "Cria um arquivo")
     @PostMapping(value = "/create_file",
             consumes={MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE} )
