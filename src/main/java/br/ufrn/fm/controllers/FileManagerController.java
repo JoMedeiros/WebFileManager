@@ -1,6 +1,7 @@
 package br.ufrn.fm.controllers;
 
 import br.ufrn.fm.models.MakeDirDetails;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api")
 @Api(value = "API REST Para gerenciamento de arquivos remotos.")
+@CrossOrigin(origins = "*") // Não é muito seguro permitir qualquer origem, mas para fins didáticos...
 public class FileManagerController {
 
     public static final String root = "storage/";
@@ -42,18 +44,17 @@ public class FileManagerController {
         commandsService = new CommandsService(command);
     }
 
-    @ApiOperation(value = "Request para mover um arquivo ou diretório",
-            consumes = "Consome um JSON com dois campos: sourcePath e destinationPath. " +
-                    "Move o arquivo do sourcePath para o destinationPath.")
+    @ApiOperation(value = "Move um arquivo ou diretório")
+    @ApiParam(name = "moveDetails", value = "Um objeto com os campos de origem do arquivo e destino.")
     @PutMapping(
             value = "/move",
             consumes={MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE} )
     public ResponseEntity<String> move(HttpServletRequest request,
                                        @RequestBody MoveDetails moveDetails) {
-        String responseTxt = "Moving " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
-        // @TODO verificar se os caminhos são válidos
-        boolean validPaths = true;
+        String responseTxt = "Moved " + moveDetails.getSourcePath() + " to " + moveDetails.getDestinationPath();
+        boolean validPaths = command.moveFile(root + moveDetails.getSourcePath(),
+                                                root + moveDetails.getDestinationPath());
         if (validPaths)
             return ResponseEntity.ok().body(responseTxt);
         else
@@ -78,10 +79,8 @@ public class FileManagerController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new String[]{"Caminho inválido"});
     }
 
-    @ApiOperation(value = "Request para deletar um arquivo ou diretório",
-    consumes = "Consome um JSON com dois campos: path e recusive. O campo path indica o caminho para o arquivo ou " +
-            "diretório a ser deletado e recursive é um booleano que indica se os arquivos serão deletados " +
-            "recursivamente")
+    @ApiOperation(value = "Request para deletar um arquivo ou diretório")
+    @ApiParam(value = "Um objeto contendo o camingo do arquivo a ser deletado.")
     @DeleteMapping(value = "/delete",
             consumes={MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE} )

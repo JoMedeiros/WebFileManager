@@ -24,16 +24,18 @@ public class CommandsService {
         }
     }
 
-    public boolean createFile(String path)
-    {
+    public boolean createFile(String path) {
         try {
             command.createFile(path);
             return true;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean moveFile(String filePath, String fileDestiny)
+    {
+        return command.moveFile(filePath, fileDestiny);
     }
 }
 
