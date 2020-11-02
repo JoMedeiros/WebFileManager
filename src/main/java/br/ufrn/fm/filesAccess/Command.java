@@ -3,6 +3,7 @@ package br.ufrn.fm.filesAccess;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class Command {
 
@@ -15,7 +16,9 @@ public class Command {
 
     public String[] listFiles(String dirPath) {
         File f = new File(dirPath);
-        return f.list();
+        return Arrays.stream(f.list()).map(s ->
+            (new File(f.getPath() +"/"+ s)).isDirectory()? s + "/": s
+        ).toArray(String[]::new);
     }
 
     public boolean createDirectory(String dirName){
