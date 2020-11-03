@@ -41,6 +41,13 @@ public class FileManagerController {
         commandsService = new CommandsService(command);
     }
 
+    @ApiOperation(value = "Retorna uma lista de arquivos e diretórios")
+    @GetMapping(value = "")
+    public String main(HttpServletRequest request)
+    {
+        return "Teste de heroku";
+    }
+
     @ApiOperation(value = "Move um arquivo ou diretório")
     @ApiParam(name = "moveDetails", value = "Um objeto com os campos de origem do arquivo e destino.")
     @PutMapping(
