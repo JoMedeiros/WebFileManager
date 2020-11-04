@@ -33,9 +33,9 @@ public class SwaggerConfig {
                 "API REST de um File Manager.",
                 "1.0",
                 "Terms of Service",
-                new Contact("Josivan Gois, Daniel Marx",
-                        "https://github.com/JoMedeiros, https://github.com/DanielM08",
-                        "gois.josivan@gmail.com, danielmarx08@gmail.com"),
+                new Contact("Josivan Gois",
+                        "https://github.com/JoMedeiros",
+                        "gois.josivan@gmail.com"),
                 "Apache License Version 2.0",
                 "https://www.apache.org/licesen.html", new ArrayList<VendorExtension>()
         );

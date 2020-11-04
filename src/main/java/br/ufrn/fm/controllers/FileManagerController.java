@@ -152,7 +152,8 @@ public class FileManagerController {
         if (makeDirDetails.isRecursive())
             responseTxt += " recursively";
         // @TODO verificar se os caminhos são válidos
-        boolean result = command.createDirectory(root + makeDirDetails.getPath());
+        boolean result = commandsService.createDirectory(makeDirDetails);
+                //command.createDirectory(root + makeDirDetails.getPath());
         if (result)
             return ResponseEntity.ok().body(responseTxt);
         else

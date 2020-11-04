@@ -8,9 +8,11 @@ import java.util.Arrays;
 public class Command {
 
     public static final String EOL = System.getProperty("line.separator");
+    public String root;
 
     public Command(String s) {
         File storageDir = new File (s);
+        root = s;
         storageDir.mkdir();
     }
 

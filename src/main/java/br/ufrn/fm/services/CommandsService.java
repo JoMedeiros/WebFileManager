@@ -3,7 +3,9 @@ package br.ufrn.fm.services;
 import static java.util.stream.Collectors.joining;
 
 import br.ufrn.fm.filesAccess.Command;
+import br.ufrn.fm.models.MakeDirDetails;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class CommandsService {
@@ -30,6 +32,24 @@ public class CommandsService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public boolean createDirectory(MakeDirDetails makeDirDetails)
+    {
+        if (makeDirDetails.isRecursive()){
+            String[] dirs = makeDirDetails.getPath().split("/");
+            String path = command.root;
+            for (String dir: dirs) {
+                path += "/" + dir;
+                File f = new File(path);
+                if (!f.exists())
+                    f.mkdir();
+            }
+            return true;
+        }
+        else {
+            return command.createDirectory(makeDirDetails.getPath());
         }
     }
 
