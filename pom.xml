@@ -16,7 +16,7 @@
 
 	<properties>
 		<java.version>8</java.version>
-        <springfox.version>2.10.0</springfox.version>
+        <springfox.version>3.0.0</springfox.version>
 	</properties>
 
 	<dependencies>
